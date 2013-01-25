@@ -1,5 +1,6 @@
-#ifndef _INCLUDE_L4D1_SIGNATURE_LINUX_
-#define _INCLUDE_L4D1_SIGNATURE_LINUX_
+#if !defined (WIN32) && defined (L4D1)
+#include <stddef.h>
+#include "game_signature.h"
 
 const char* server_dll = "server.so";
 const char* engine_dll = "engine.so";
@@ -34,7 +35,6 @@ void* server_bplayers_org = NULL;
 //fuction is in server.so
 const char* human_limit = "\x11\x8B\x55\xC3\x8B\x02\x89\x14\xC3\xFF\x90\xC3\x02\x00\x00\x39\xF8\x7E";
 const char* human_limit_new = "\x02\x10\x90\x90";
-void* human_limit_org = NULL;
 
 //_ZL10maxplayersRK8CCommand
 //fuction is in engine.so
@@ -55,5 +55,5 @@ const char* lobby_match = "\x0A\x55\x89\xE5\xB8\x08\x00\x00\x00\x5D\xC3";
 unsigned char lobby_match_new[] = {0x01, 0x04, 0xC3};
 void* lobby_match_org = NULL;
 
-#endif //_INCLUDE_L4D1_SIGNATURE_LINUX_
+#endif //!defined (WIN32) && define (L4D1)
 

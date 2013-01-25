@@ -1,6 +1,7 @@
 #include "l4dtoolz_mm.h"
 #include "signature.h"
 #include "game_signature.h"
+#include "sign_humanlimit.h"
 
 l4dtoolz g_l4dtoolz;
 IVEngineServer* engine = NULL;
@@ -11,14 +12,12 @@ void* l4dtoolz::max_players_friend_lobby = NULL;
 void* l4dtoolz::max_players_connect = NULL;
 void* l4dtoolz::max_players_server_browser = NULL;
 void* l4dtoolz::lobby_sux_ptr = NULL;
-void* l4dtoolz::chuman_limit = NULL;
 void* l4dtoolz::tmp_player = NULL;
 void* l4dtoolz::tmp_player2 = NULL;
 void* l4dtoolz::unreserved_ptr = NULL;
 void* l4dtoolz::lobby_match_ptr = NULL;
 
 ConVar sv_maxplayers("sv_maxplayers", "-1", 0, "Max Human Players", true, -1, true, 32, l4dtoolz::OnChangeMaxplayers);
-ConVar sv_removehumanlimit("sv_removehumanlimit", "0", 0, "Remove Human limit reached kick", true, 0, true, 1, l4dtoolz::OnChangeRemovehumanlimit);
 ConVar L4DToolZ("L4DToolZ", "",0,"L4DToolZ Author",l4dtoolz::OnChangeIvailosp);
 ConVar sv_force_unreserved("sv_force_unreserved", "0", 0, "Disallow lobby reservation cookie", true, 0, true, 1, l4dtoolz::OnChangeUnreserved);
 
@@ -54,25 +53,6 @@ void l4dtoolz::OnChangeMaxplayers ( IConVar *var, const char *pOldValue, float f
 		}
 	}
 }
-
-void l4dtoolz::OnChangeRemovehumanlimit ( IConVar *var, const char *pOldValue, float flOldValue )
-{
-	int new_value = ((ConVar*)var)->GetInt();
-	int old_value = atoi(pOldValue);
-
-	if(chuman_limit == NULL) {
-		Msg( "sv_removehumanlimit init error\n");
-		return;
-	}
-
-	if(new_value != old_value) {
-		if(new_value == 1)
-			write_signature(chuman_limit, human_limit_new);
-		else
-			write_signature(chuman_limit, human_limit_org);
-	}
-}
-
 
 void l4dtoolz::OnChangeIvailosp ( IConVar *var, const char *pOldValue, float flOldValue )
 {
@@ -212,10 +192,8 @@ bool l4dtoolz::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool
 
 	ret = find_base(server_dll, &base_addr);
 
-	if(!ret && !chuman_limit) {
-		chuman_limit = find_signature(human_limit, &base_addr, 0);
-		get_original_signature(chuman_limit, human_limit_new, human_limit_org);
-	}
+	if(!ret) 
+		init_humanlimit(&base_addr);
 
 #ifndef WIN32
 	if(!ret && !max_players_server_browser) {
@@ -238,7 +216,6 @@ bool l4dtoolz::Unload(char *error, size_t maxlen)
 	write_signature(max_players_connect, max_players_org);
 	write_signature(lobby_sux_ptr, lobby_sux_org);
 	write_signature(max_players_server_browser, server_bplayers_org);
-	write_signature(chuman_limit, human_limit_org);
 	write_signature(unreserved_ptr, unreserved_org);
 	write_signature(lobby_match_ptr, lobby_match_org);
 
@@ -246,7 +223,6 @@ bool l4dtoolz::Unload(char *error, size_t maxlen)
 	free(max_players_org);
 	free(lobby_sux_org);
 	free(server_bplayers_org);
-	free(human_limit_org);
 	free(unreserved_org);
 	free(lobby_match_org);
 
@@ -254,9 +230,10 @@ bool l4dtoolz::Unload(char *error, size_t maxlen)
 	max_players_org = NULL;
 	lobby_sux_org = NULL;
 	server_bplayers_org = NULL;
-	human_limit_org = NULL;
 	unreserved_org = NULL;
 	lobby_match_org = NULL;
+
+	deinit_humanlimit();
 
 	return true;
 }

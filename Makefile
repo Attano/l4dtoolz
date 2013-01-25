@@ -16,7 +16,7 @@ MMSOURCE19 = ..
 #####################################
 
 PROJECT = l4dtoolz_mm
-OBJECTS = l4dtoolz_mm.cpp signature.cpp
+OBJECTS = l4dtoolz_mm.cpp signature.cpp sign_humanlimit.cpp l4d1_signature_linux.cpp l4d1_signature_win32.cpp l4d2_signature_linux.cpp l4d2_signature_win32.cpp
 
 ##############################################
 ### CONFIGURE ANY OTHER FLAGS/OPTIONS HERE ###
