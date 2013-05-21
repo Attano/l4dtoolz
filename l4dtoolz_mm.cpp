@@ -17,7 +17,7 @@ void* l4dtoolz::tmp_player2 = NULL;
 void* l4dtoolz::unreserved_ptr = NULL;
 void* l4dtoolz::lobby_match_ptr = NULL;
 
-ConVar sv_maxplayers("sv_maxplayers", "-1", 0, "Max Human Players", true, -1, true, 32, l4dtoolz::OnChangeMaxplayers);
+ConVar sv_maxplayers("l4d_maxplayers", "-1", 0, "Max Human Players", true, -1, true, 32, l4dtoolz::OnChangeMaxplayers);
 ConVar sv_removehumanlimit("sv_removehumanlimit", "0", 0, "Remove Human limit reached kick", true, 0, true, 1, l4dtoolz::OnChangeRemovehumanlimit);
 ConVar L4DToolZ("L4DToolZ", "",0,"L4DToolZ Author",l4dtoolz::OnChangeIvailosp);
 ConVar sv_force_unreserved("sv_force_unreserved", "0", 0, "Disallow lobby reservation cookie", true, 0, true, 1, l4dtoolz::OnChangeUnreserved);
@@ -31,7 +31,16 @@ void l4dtoolz::OnChangeMaxplayers ( IConVar *var, const char *pOldValue, float f
 		return;
 	}
 	if(new_value != old_value) {
+		ConVar *sv_visiblemaxplayers = g_pCVar->FindVar("sv_visiblemaxplayers");
+		sv_visiblemaxplayers->SetValue(new_value);
+		
+		if(new_value > 8) {
+			sv_removehumanlimit.SetValue(true);
+		}
+		
 		if(new_value >= 0) {
+			sv_force_unreserved.SetValue(true);
+
 			max_players_new[4] = friends_lobby_new[3] = server_bplayers_new[3] = new_value;
 			if(lobby_match_ptr) {
 				lobby_match_new[2] = new_value;
@@ -274,7 +283,7 @@ const char *l4dtoolz::GetVersion()
 #ifdef __GIT_VERSION
 	return __GIT_VERSION;
 #else
-	return "1.0.0.9g-unknown";
+	return "1.0.1";
 #endif
 }
 
@@ -305,5 +314,5 @@ const char *l4dtoolz::GetName()
 
 const char *l4dtoolz::GetURL()
 {
-	return "n/a";
+	return "https://github.com/Attano/l4dtoolz";
 }

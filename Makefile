@@ -8,8 +8,8 @@ GIT_VERSION = $(shell sh -c 'git describe --abbrev=8 --dirty --always')
 ###########################################
 
 HL2SDK_L4D = ../../hl2sdk-l4d
-HL2SDK_L4D2 = ../../hl2sdk-l4d2
-MMSOURCE19 = ..
+HL2SDK_L4D2 = ../hl2sdk-l4d2
+MMSOURCE19 = ../mmsource-central
 
 #####################################
 ### EDIT BELOW FOR OTHER PROJECTS ###
